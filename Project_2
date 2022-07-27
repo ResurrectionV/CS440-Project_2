@@ -12,6 +12,20 @@ def randomS(l):
     rn = random.randint(1,lnt)
     return l[rn-1]
 
+def sortL(l):
+    if l == []:
+        return l
+    count = 0
+    for i in l:
+        l[count] = int(i)
+        count = count + 1
+    l.sort()
+    count = 0
+    for i in l:
+        l[count] = str(i)
+        count = count + 1
+    return l
+
 #class part
 class graph:
     
@@ -60,6 +74,9 @@ class graph:
                 n2 = randomS(list(self.graph))
             self.addEdge(n1,n2)
             newEcount = newEcount + 1
+        for i in range(1,numN+1):
+            self.graph[str(i)][0] = sortL(self.graph[str(i)][0])
+        
     
     def setA(self, pos):
         self.graph[str(pos)][1] = 1
