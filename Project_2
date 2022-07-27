@@ -1,0 +1,94 @@
+#Introduction
+#This project is worked by xxx and xxx
+#TA:
+
+
+#import part
+import random
+
+#function
+def randomS(l):
+    lnt = len(l)
+    rn = random.randint(1,lnt)
+    return l[rn-1]
+
+#class part
+class graph:
+    
+    def __init__(self):
+        self.graph = {}
+        
+    def addNode(self, k):
+        #neighbours,target,agent
+        self.graph[str(k)] = [[],0,0] #0 means not at the this Node
+        
+    def addEdge(self, k, val):
+        if len(self.graph[str(k)][0]) == 3:
+            #False, not able to add any more edges because it has reached maximal degree
+            return 0
+        else:
+            list_temp = self.graph[str(k)][0]
+            list_temp.append(str(val))
+            self.graph[str(k)][0] = list_temp
+            return 1
+    
+    def printNb(self):
+        for p1,p2 in self.graph.items():
+            if len(p2[0]) == 0:
+                print("Node " + p1 + " has no edge.")
+            if len(p2[0]) == 1:
+                print("The Node " + p1 + " is connected to Node " + p2[0][0] + ".")
+            if len(p2[0]) == 2:
+                print("The Node " + p1 + " is connected to Nodes " + p2[0][0] + " and " + p2[0][1] + ".")
+            if len(p2[0]) == 3:
+                print("The Node " + p1 + " is connected to Nodes " + p2[0][0] + ", " + p2[0][1] + ", and " + p2[0][2] + ".")
+    
+    def EvnSet(self, numN):
+        for i in range(1,numN+1):
+            g.addNode(i)
+            if i == numN:
+                self.addEdge(i,1)
+            else:
+                self.addEdge(i,i+1)
+        newEcount = 0
+        while not newEcount == 10:
+            n1 = randomS(list(self.graph))
+            if len(self.graph[n1][0]) == 3:
+                continue
+            n2 = n1
+            while n2 == n1 or n2 in self.graph[n1][0]:
+                n2 = randomS(list(self.graph))
+            self.addEdge(n1,n2)
+            newEcount = newEcount + 1
+    
+    def setA(self, pos):
+        self.graph[str(pos)][1] = 1
+        
+    def setT(self, pos):
+        self.graph[str(pos)][2] = 1
+        
+    def printA(self):
+        for i in list(self.graph):
+            if self.graph[i][1] == 1:
+                print("Target is currently located at Node " + i + ".")
+    
+    def printT(self):
+        for i in list(self.graph):
+            if self.graph[i][2] == 1:
+                print("Target is currently located at Node " + i + ".")
+            
+    
+    
+
+
+#test part
+
+g = graph()
+g.EvnSet(10)
+g.printNb()
+g.setA(1)
+g.setT(10)
+print("--------------------------------------------------")
+g.printA()
+print("--------------------------------------------------")
+g.printT()
