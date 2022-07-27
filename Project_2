@@ -61,8 +61,13 @@ class graph:
         for i in range(1,numN+1):
             g.addNode(i)
             if i == numN:
+                self.addEdge(i,i-1)
                 self.addEdge(i,1)
+            elif i == 1:
+                self.addEdge(i,i+1)
+                self.addEdge(i,numN)
             else:
+                self.addEdge(i,i-1)
                 self.addEdge(i,i+1)
         newEcount = 0
         while not newEcount == 10:
@@ -101,7 +106,7 @@ class graph:
 #test part
 
 g = graph()
-g.EvnSet(10)
+g.EvnSet(40)
 g.printNb()
 g.setA(1)
 g.setT(10)
