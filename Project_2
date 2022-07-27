@@ -108,11 +108,11 @@ class graph:
         #function for set all the agent and target as 0
         pass
     
-    def agent1(self):
+    def agent0(self):
         start_pos_a = randomS(list(self.graph))
         self.graph[start_pos_a][2] = 1 
         
-    def target_move_agent1(self):
+    def target_move_agent0(self):
         cur_pos = self.printT()
         self.graph[cur_pos][1] = 0
         nb_list = self.graph[cur_pos][0]
