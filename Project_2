@@ -90,16 +90,35 @@ class graph:
     def setT(self, pos):
         self.graph[str(pos)][2] = 1
         
-    def printA(self):
+    def printT(self):
         for i in list(self.graph):
             if self.graph[i][1] == 1:
                 print("Target is currently located at Node " + i + ".")
-    
-    def printT(self):
+                return i   
+            
+    def printA(self):
         for i in list(self.graph):
             if self.graph[i][2] == 1:
-                print("Target is currently located at Node " + i + ".")
-            
+                print("Agent is currently located at Node " + i + ".")
+                return i
+    
+    
+    
+    def clearAT(self):
+        #function for set all the agent and target as 0
+        pass
+    
+    def agent1(self):
+        start_pos_a = randomS(list(self.graph))
+        self.graph[start_pos_a][2] = 1 
+        
+    def target_move_agent1(self):
+        cur_pos = self.printT()
+        self.graph[cur_pos][1] = 0
+        nb_list = self.graph[cur_pos][0]
+        next_pos = randomS(nb_list)
+        self.graph[next_pos][1] = 1
+        
     
     
 
