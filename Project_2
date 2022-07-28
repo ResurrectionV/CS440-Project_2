@@ -5,6 +5,7 @@
 
 # import part
 import random
+from collections import deque
 
 
 # function
@@ -28,6 +29,17 @@ def sortL(l):
         count = count + 1
     return l
 
+# bfs
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+        self.parent = None
+
+
+class lList:
+    def __init__(self):
+        self.head = None
 
 # class part
 class graph:
@@ -114,6 +126,8 @@ class graph:
         print("All the data are reset")
         pass
 
+#-------------------------------------------------------------
+#Code for agent0
     def agent0(self):
         start_pos_a = randomS(list(self.graph))
         self.graph[start_pos_a][2] = 1
@@ -135,21 +149,44 @@ class graph:
             t = self.printT()
             
         
+#-------------------------------------------------------------
+#Code for agent1
 
     def bfs(self):
+        ll = lList()
         target = self.printT()
         cur_pos = self.printA()
         q = [cur_pos]
-        visited = set()
-        visited.add(cur_pos)
+        visited = []
+        ll.head = Node(cur_pos)
+        cur_node = ll.head
+        prev_node = None
         while q:
-            node = q.pop()
+            q = deque(q)
+            node = q.popleft()
+            q = list(q)
+            visited.append(node)
+            prev_node = ll.head
+            while not prev_node.data == node:
+                prev_node = prev_node.next 
             if node == target:
-                return True
+                print(visited)
+                temp = ll.head
+                temp = temp.next
+                while not self.graph[temp.data][1] == 1:
+                    last = temp
+                    temp = temp.next
+                while not last == None:
+                    if last.parent == None:
+                        return last.data
+                    last = last.parent
             for item in self.graph[node][0]:
                 if item not in visited:
                     q.append(item)
-                    visited.add(item)
+                    cur_node.next = Node(item)
+                    cur_node = cur_node.next
+                    cur_node.parent = prev_node
+                    
         return False
 
 
@@ -159,4 +196,8 @@ class graph:
 g = graph()
 g.EvnSet(40)
 g.printNb()
-g.agent0_main(40)
+g.agent0()
+g.setT(40)
+g.printA()
+g.printT()
+print(g.bfs())
