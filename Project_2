@@ -155,7 +155,8 @@ class graph:
     def bfs(self):
         ll = lList()
         target = self.printT()
-        cur_pos = self.printA()
+        init_pos = self.printA()
+        cur_pos = init_pos
         q = [cur_pos]
         visited = []
         ll.head = Node(cur_pos)
@@ -176,10 +177,12 @@ class graph:
                 while not self.graph[temp.data][1] == 1:
                     last = temp
                     temp = temp.next
-                while not last == None:
-                    if last.parent == None:
+                last_parent = last.parent
+                while not last_parent.parent == None:
+                    last = last_parent
+                    last_parent = last_parent.parent
+                    if last_parent.parent == None:
                         return last.data
-                    last = last.parent
             for item in self.graph[node][0]:
                 if item not in visited:
                     q.append(item)
