@@ -132,7 +132,7 @@ class graph:
         start_pos_a = randomS(list(self.graph))
         self.graph[start_pos_a][2] = 1
 
-    def target_move_agent0(self, cur_pos):
+    def target_randomwalk(self, cur_pos):
         self.graph[cur_pos][1] = 0
         nb_list = self.graph[cur_pos][0]
         next_pos = randomS(nb_list)
@@ -144,63 +144,105 @@ class graph:
         a = self.printA()
         t = self.printT()
         while not t == a:
-            self.target_move_agent0(t)
+            self.target_randomwalk(t)
             print("After one timestep move")
             t = self.printT()
+        if t == a:
+            print("Target is catched by agent_0 at position " + t + "!")
             
         
 #-------------------------------------------------------------
 #Code for agent1
 
+    
     def bfs(self):
-        ll = lList()
-        target = self.printT()
-        init_pos = self.printA()
-        cur_pos = init_pos
-        q = [cur_pos]
+        a_pos = self.printA()
+        t_pos = self.printT()
+        q = [a_pos]
         visited = []
-        ll.head = Node(cur_pos)
+        ll = lList()
+        ll.head = Node(a_pos)
         cur_node = ll.head
-        prev_node = None
-        while q:
+        
+        
+        while not q == []:
             q = deque(q)
-            node = q.popleft()
+            cur = q.popleft()
             q = list(q)
-            visited.append(node)
-            prev_node = ll.head
-            while not prev_node.data == node:
-                prev_node = prev_node.next 
-            if node == target:
-                print(visited)
-                temp = ll.head
-                temp = temp.next
-                while not self.graph[temp.data][1] == 1:
-                    last = temp
-                    temp = temp.next
-                last_parent = last.parent
-                while not last_parent.parent == None:
-                    last = last_parent
-                    last_parent = last_parent.parent
-                    if last_parent.parent == None:
-                        return last.data
-            for item in self.graph[node][0]:
+            visited.append(cur)
+            check_node = ll.head
+            if check_node.data == cur:
+                prev_node = check_node
+            else:
+                while not check_node.data == cur:
+                    check_node = check_node.next
+                    prev_node = check_node
+                    #then we get the parent node which should be assigned to connected node
+            
+            if cur == t_pos:
+                while not prev_node.parent == ll.head:
+                    prev_node = prev_node.parent
+                return prev_node.data
+            
+            for item in self.graph[cur][0]:
                 if item not in visited:
                     q.append(item)
                     cur_node.next = Node(item)
                     cur_node = cur_node.next
                     cur_node.parent = prev_node
-                    
+        print("Path not found")
         return False
+
+        
+        
+        
+        
+        
+        
+        
+        
+
+    def agent1_main(self, t_pos):
+        self.setT(t_pos)
+        self.agent0()
+        a = self.printA()
+        t = self.printT()
+        if t == a:
+            print("Target is catched by agent_0 at position " + t + "!")
+            return True
+        else:
+            while not t == a:
+                print("After one timestep, Tagret move to:")
+                self.target_randomwalk(t)
+                t = self.printT()
+                if t == a:
+                    print("Target is catched by agent_0 at position " + t + "!")
+                    return True
+                a_next_pos = self.bfs()
+                self.graph[a][2] = 0
+                self.graph[a_next_pos][2] = 1
+                a = a_next_pos
+                if t == a:
+                    print("Target is catched by agent_0 at position " + t + "!")
+                    return True
+        return False
+        
+        
+    
 
 
 
 # test part
+""" Test for agent 0
+g = graph()
+g.EvnSet(40)
+g.printNb()
+g.agent0_main(29)
+"""
+
+
 
 g = graph()
 g.EvnSet(40)
 g.printNb()
-g.agent0()
-g.setT(40)
-g.printA()
-g.printT()
-print(g.bfs())
+g.agent1_main(29)
