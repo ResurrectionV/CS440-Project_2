@@ -193,15 +193,6 @@ class graph:
         print("Path not found")
         return False
 
-        
-        
-        
-        
-        
-        
-        
-        
-
     def agent1_main(self, t_pos):
         self.setT(t_pos)
         self.agent0()
@@ -223,10 +214,72 @@ class graph:
                 self.graph[a_next_pos][2] = 1
                 a = a_next_pos
                 if t == a:
-                    print("Target is catched by agent_0 at position " + t + "!")
+                    print("Target is catched by agent_1 at position " + t + "!")
                     return True
         return False
+#-------------------------------------------------------------
+#Code for agent2
         
+    def DFS(self):
+        a_pos = self.printA()
+        t_pos = self.printT()
+        q = [a_pos]
+        visited = []
+        ll = lList()
+        ll.head = Node(a_pos)
+        cur_node = ll.head
+        
+        
+        while not q == []:
+            cur = q.pop()
+            visited.append(cur)
+            check_node = ll.head
+            if check_node.data == cur:
+                prev_node = check_node
+            else:
+                while not check_node.data == cur:
+                    check_node = check_node.next
+                    prev_node = check_node
+                    #then we get the parent node which should be assigned to connected node
+            
+            if cur == t_pos:
+                while not prev_node.parent == ll.head:
+                    prev_node = prev_node.parent
+                return prev_node.data
+            
+            for item in self.graph[cur][0]:
+                if item not in visited:
+                    q.append(item)
+                    cur_node.next = Node(item)
+                    cur_node = cur_node.next
+                    cur_node.parent = prev_node
+        print("Path not found")
+        return False
+
+    def agent2_main(self, t_pos):
+        self.setT(t_pos)
+        self.agent0()
+        a = self.printA()
+        t = self.printT()
+        if t == a:
+            print("Target is catched by agent_0 at position " + t + "!")
+            return True
+        else:
+            while not t == a:
+                print("After one timestep, Tagret move to:")
+                self.target_randomwalk(t)
+                t = self.printT()
+                if t == a:
+                    print("Target is catched by agent_0 at position " + t + "!")
+                    return True
+                a_next_pos = self.DFS()
+                self.graph[a][2] = 0
+                self.graph[a_next_pos][2] = 1
+                a = a_next_pos
+                if t == a:
+                    print("Target is catched by agent_1 at position " + t + "!")
+                    return True
+        return False
         
     
 
@@ -241,8 +294,14 @@ g.agent0_main(29)
 """
 
 
-
+"""Test for agent 1
 g = graph()
 g.EvnSet(40)
 g.printNb()
 g.agent1_main(29)
+"""
+
+g = graph()
+g.EvnSet(40)
+g.printNb()
+g.agent2_main(29)
