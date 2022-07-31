@@ -14,6 +14,9 @@ def randomS(l):
     rn = random.randint(1, lnt)
     return l[rn - 1]
 
+def normalize(probs):
+    prob_factor = 1 / sum(probs)
+    return [prob_factor * p for p in probs]
 
 def sortL(l):
     if l == []:
@@ -48,8 +51,8 @@ class graph:
         self.graph = {}
 
     def addNode(self, k):
-        # neighbours,target,agent, probability
-        self.graph[str(k)] = [[], 0, 0, 0]  # 0 means not at the this Node
+        # neighbours,target, agent, probability, check_position
+        self.graph[str(k)] = [[], 0, 0, 0, 0]  # 0 means not at the this Node
 
     def addEdge(self, k, val):
         if len(self.graph[str(k)][0]) == 3:
@@ -104,6 +107,9 @@ class graph:
 
     def setT(self, pos):
         self.graph[str(pos)][1] = 1
+        
+    def setC(self, pos):
+        self.graph[str(pos)][4] = 1
 
     def printT(self):
         for i in list(self.graph):
@@ -116,7 +122,14 @@ class graph:
             if self.graph[i][2] == 1:
                 print("Agent is currently located at Node " + i + ".")
                 return i
-
+    
+    def printC(self):
+        for i in list(self.graph):
+            if self.graph[i][4] == 1:
+                print("check_position is currently located at Node " + i + ".")
+                return i
+            
+            
     def clearAT(self):
         # function for set all the agent and target as 0
         t = self.printT()
@@ -304,19 +317,31 @@ class graph:
         
         for item in prev_state:
             self.graph[item][3] = 0
+            
+        normalize_list_pos = []
+        normalize_list_value = []
+        for item in list(self.graph):
+            if not self.graph[item][3] == 0:
+                normalize_list_pos.append(item)
+                normalize_list_value.append(self.graph[item][3])
+        #print(normalize_list_pos)
+        #print(normalize_list_value)
+        normalize_list_value = normalize(normalize_list_value)
+        #print(normalize_list_value)
+        for item in range(len(normalize_list_pos)):
+            self.graph[normalize_list_pos[item]][3] = normalize_list_value[item]
     
     
     def agent4_main(self):
         #randomly select a position to start
-        start_pos = randomS(list(self.graph))
-        for item in self.graph[start_pos][0]:
-            self.graph[item][3] = 1/len(self.graph[start_pos][0])
+        check_pos = randomS(list(self.graph))
+        for item in self.graph[check_pos][0]:
+            self.graph[item][3] = 1/len(self.graph[check_pos][0])
         prob_list = []
         for item in list(self.graph):
             if not self.graph[item][3] == 0:
                 prob_list.append(item)
         
-        check_pos = randomS(list(self.graph))
         t_pos = randomS(list(self.graph))
         if t_pos == check_pos:
             print("Target is found at our check_position " + check_pos + "!")
@@ -347,10 +372,131 @@ class graph:
             print()
             self.agent4()
                 
+#-------------------------------------------------------------
+#Code for agent6
+    def bfs_agent6(self):
+        a_pos = self.printA()
+        c_pos = self.printC()
+        if a_pos == c_pos:
+            return a_pos
+        q = [a_pos]
+        visited = []
+        ll = lList()
+        ll.head = Node(a_pos)
+        cur_node = ll.head
+        
+        
+        while not q == []:
+            q = deque(q)
+            cur = q.popleft()
+            q = list(q)
+            visited.append(cur)
+            check_node = ll.head
+            if check_node.data == cur:
+                prev_node = check_node
+            else:
+                while not check_node.data == cur:
+                    check_node = check_node.next
+                    prev_node = check_node
+                    #then we get the parent node which should be assigned to connected node
             
+            if cur == c_pos:
+                while not prev_node.parent == ll.head:
+                    prev_node = prev_node.parent
+                return prev_node.data
             
-                    
+            for item in self.graph[cur][0]:
+                if item not in visited:
+                    q.append(item)
+                    cur_node.next = Node(item)
+                    cur_node = cur_node.next
+                    cur_node.parent = prev_node
+        print("Path not found")
+        return False
+    
+    
+    def agent6(self):
+        prev_state = []
+        new_state = []
+        for item in list(self.graph):
+            if not self.graph[item][3] == 0:
+                prev_state.append(item)
+        for i in prev_state:
+            for j in self.graph[i][0]:
+                if j not in new_state:
+                    new_state.append(j)
+        
+        for item in new_state:
+            prob = 0
+            for j in self.graph[item][0]:
+                if not self.graph[j][3] == 0:
+                    prob = prob + (1/len(self.graph[j][0]))*self.graph[j][3]
+            self.graph[item][3] = prob
+        
+        for item in prev_state:
+            self.graph[item][3] = 0
             
+        normalize_list_pos = []
+        normalize_list_value = []
+        for item in list(self.graph):
+            if not self.graph[item][3] == 0:
+                normalize_list_pos.append(item)
+                normalize_list_value.append(self.graph[item][3])
+        #print(normalize_list_pos)
+        #print(normalize_list_value)
+        normalize_list_value = normalize(normalize_list_value)
+        #print(normalize_list_value)
+        for item in range(len(normalize_list_pos)):
+            self.graph[normalize_list_pos[item]][3] = normalize_list_value[item]
+    
+    def agent6_main(self):
+        #randomly select a position to start
+        check_pos = randomS(list(self.graph))
+        agent_pos = randomS(list(self.graph))
+        self.setC(check_pos)
+        self.setA(agent_pos)
+        for item in self.graph[check_pos][0]:
+            self.graph[item][3] = 1/len(self.graph[check_pos][0])
+        prob_list = []
+        for item in list(self.graph):
+            if not self.graph[item][3] == 0:
+                prob_list.append(item)
+        
+        t_pos = randomS(list(self.graph))
+        self.setT(t_pos)
+        if t_pos == agent_pos:
+            print("Target is catched by agent 6 at position " + agent_pos + "!")
+            return True
+        while not agent_pos == t_pos:
+            highest_prob_list = []
+            highest_prob = 0
+            print("After a timestep:")
+            self.target_randomwalk(t_pos)
+            t_pos = self.printT()
+            
+            for item in prob_list:
+                if self.graph[item][3] > highest_prob:
+                    highest_prob_list = []
+                    highest_prob = self.graph[item][3]
+                    highest_prob_list.append(item)
+                    continue
+                if self.graph[item][3] == highest_prob:
+                    highest_prob_list.append(item)
+            check_pos = randomS(highest_prob_list)
+            agent_next_pos = self.bfs_agent6()
+            self.graph[agent_pos][2] = 0
+            agent_pos = agent_next_pos
+            self.graph[agent_pos][2] = 1
+            if agent_pos == t_pos:
+                print("Target is catched by agent 6 at position " + agent_pos + "!")
+                return True
+            self.graph[check_pos][3] = 0
+            print("----------------------------------")
+            print("The check_position is currently at " + check_pos)
+            print("The target_position is currently at " + t_pos)
+            print()
+            self.agent6()
+
     
 
 
@@ -377,6 +523,8 @@ g.EvnSet(40)
 g.printNb()
 g.agent2_main(29)
 """
+
+"""Test for agent 4
 g = graph()
 g.EvnSet(40)
 g.graph["2"][3] = 0.2
@@ -384,3 +532,14 @@ g.graph["9"][3] = 0.2
 g.graph["1"][3] = 0.2
 g.printNb()
 g.agent4_main()
+"""
+
+"""Test for agent 4
+g = graph()
+g.EvnSet(40)
+g.graph["2"][3] = 0.2
+g.graph["9"][3] = 0.2
+g.graph["1"][3] = 0.2
+g.printNb()
+g.agent6_main()
+"""
