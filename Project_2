@@ -48,8 +48,8 @@ class graph:
         self.graph = {}
 
     def addNode(self, k):
-        # neighbours,target,agent
-        self.graph[str(k)] = [[], 0, 0]  # 0 means not at the this Node
+        # neighbours,target,agent, probability
+        self.graph[str(k)] = [[], 0, 0, 0]  # 0 means not at the this Node
 
     def addEdge(self, k, val):
         if len(self.graph[str(k)][0]) == 3:
@@ -277,10 +277,80 @@ class graph:
                 self.graph[a_next_pos][2] = 1
                 a = a_next_pos
                 if t == a:
-                    print("Target is catched by agent_1 at position " + t + "!")
+                    print("Target is catched by agent_2 at position " + t + "!")
                     return True
         return False
         
+#-------------------------------------------------------------
+#Code for agent4
+    
+    def agent4(self):
+        prev_state = []
+        new_state = []
+        for item in list(self.graph):
+            if not self.graph[item][3] == 0:
+                prev_state.append(item)
+        for i in prev_state:
+            for j in self.graph[i][0]:
+                if j not in new_state:
+                    new_state.append(j)
+        
+        for item in new_state:
+            prob = 0
+            for j in self.graph[item][0]:
+                if not self.graph[j][3] == 0:
+                    prob = prob + (1/len(self.graph[j][0]))*self.graph[j][3]
+            self.graph[item][3] = prob
+        
+        for item in prev_state:
+            self.graph[item][3] = 0
+    
+    
+    def agent4_main(self):
+        #randomly select a position to start
+        start_pos = randomS(list(self.graph))
+        for item in self.graph[start_pos][0]:
+            self.graph[item][3] = 1/len(self.graph[start_pos][0])
+        prob_list = []
+        for item in list(self.graph):
+            if not self.graph[item][3] == 0:
+                prob_list.append(item)
+        
+        check_pos = randomS(list(self.graph))
+        t_pos = randomS(list(self.graph))
+        if t_pos == check_pos:
+            print("Target is found at our check_position " + check_pos + "!")
+            return True
+        while not check_pos == t_pos:
+            highest_prob_list = []
+            highest_prob = 0
+            print("After a timestep:")
+            self.target_randomwalk(t_pos)
+            t_pos = self.printT()
+            
+            for item in prob_list:
+                if self.graph[item][3] > highest_prob:
+                    highest_prob_list = []
+                    highest_prob = self.graph[item][3]
+                    highest_prob_list.append(item)
+                    continue
+                if self.graph[item][3] == highest_prob:
+                    highest_prob_list.append(item)
+            check_pos = randomS(highest_prob_list)
+            if check_pos == t_pos:
+                print("Target is found at our check_position " + check_pos + "!")
+                return True
+            self.graph[check_pos][3] = 0
+            print("----------------------------------")
+            print("The check_position is currently at " + check_pos)
+            print("The target_position is currently at " + t_pos)
+            print()
+            self.agent4()
+                
+            
+            
+                    
+            
     
 
 
@@ -301,7 +371,16 @@ g.printNb()
 g.agent1_main(29)
 """
 
+"""Test for agent 2
 g = graph()
 g.EvnSet(40)
 g.printNb()
 g.agent2_main(29)
+"""
+g = graph()
+g.EvnSet(40)
+g.graph["2"][3] = 0.2
+g.graph["9"][3] = 0.2
+g.graph["1"][3] = 0.2
+g.printNb()
+g.agent4_main()
